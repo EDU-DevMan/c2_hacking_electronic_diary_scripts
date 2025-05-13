@@ -39,15 +39,13 @@ TEXTS = [
 
 
 def fix_marks(schoolkid):
-    return Mark.objects.filter(schoolkid=Schoolkid.objects.filter(
-            full_name=schoolkid).first(),
-            points__in=[2, 3]).update(points=5)
+    return Mark.objects.filter(schoolkid=schoolkid,
+                               points__in=[2, 3]).update(points=5)
 
 
 def remove_chastisements(schoolkid):
     return Chastisement.objects.filter(
-        schoolkid=Schoolkid.objects.filter(
-            full_name=schoolkid).first()).delete()
+        schoolkid=schoolkid).delete()
 
 
 def create_commendation(schoolkid, subject):
