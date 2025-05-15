@@ -49,22 +49,19 @@ def remove_chastisements(schoolkid):
 
 
 def create_commendation(schoolkid, subject):
-    created = Mark.objects.filter(
-        schoolkid=schoolkid,
-        subject=subject).order_by("-created").first().created
-
-    teacher = Mark.objects.filter(
-        schoolkid=schoolkid,
-        subject=subject).order_by("-created").first().teacher
+    lesson = Lesson.objects.filter(
+        year_of_study=schoolkid.year_of_study,
+        group_letter=schoolkid.group_letter,
+        subject=subject).order_by('-date').first()
 
     if not Commendation.objects.filter(schoolkid=schoolkid,
                                        subject=subject).first():
         return Commendation.objects.create(
             text=random.choice(TEXTS),
-            created=created,
+            created=lesson.date,
             schoolkid=schoolkid,
             subject=subject,
-            teacher=teacher,)
+            teacher=lesson.teacher,)
 
 
 def main():
@@ -73,9 +70,9 @@ def main():
 
     try:
         schoolkid = Schoolkid.objects.get(full_name=FULL_NAME)
-        subject = Subject.objects.get(
+        subject = Subject.objects.filter(
             year_of_study=schoolkid.year_of_study,
-            title=TITLE)
+            title=TITLE).first()
         fix_marks(schoolkid.full_name)
         remove_chastisements(schoolkid.full_name)
         create_commendation(schoolkid, subject)
