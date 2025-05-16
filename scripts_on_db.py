@@ -70,11 +70,12 @@ def main():
 
     try:
         schoolkid = Schoolkid.objects.get(full_name=FULL_NAME)
-        subject = Subject.objects.filter(
+        subject = Subject.objects.get(
             year_of_study=schoolkid.year_of_study,
-            title=TITLE).first()
-        fix_marks(schoolkid.full_name)
-        remove_chastisements(schoolkid.full_name)
+            title=TITLE)
+
+        fix_marks(schoolkid)
+        remove_chastisements(schoolkid)
         create_commendation(schoolkid, subject)
         print("""
 Из журнала удалены двойки и тройки
