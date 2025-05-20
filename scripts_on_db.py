@@ -64,28 +64,45 @@ def create_commendation(schoolkid, subject):
             teacher=lesson.teacher,)
 
 
+def get_user(FULL_NAME):
+    try:
+        return Schoolkid.objects.get(full_name__contains=FULL_NAME)
+    except Subject.MultipleObjectsReturned:
+        Schoolkid.objects.filter(full_name__contains=FULL_NAME).first()
+    except Schoolkid.DoesNotExist:
+        return None
+
+
+def get_subject(FULL_NAME, TITLE):
+    try:
+        return Subject.objects.get(
+            year_of_study=get_user(FULL_NAME).year_of_study,
+            title=TITLE)
+    except Subject.MultipleObjectsReturned:
+        return Subject.objects.filter(
+            year_of_study=get_user(FULL_NAME).year_of_study,
+            title=TITLE).first()
+    except Subject.DoesNotExist:
+        return None
+
+
 def main():
     FULL_NAME = input(str("Введити ФИО ученика:"))
     TITLE = input(str("Введите учебный предмет:"))
 
-    try:
-        schoolkid = Schoolkid.objects.get(full_name=FULL_NAME)
-        subject = Subject.objects.get(
-            year_of_study=schoolkid.year_of_study,
-            title=TITLE)
-
-        fix_marks(schoolkid)
-        remove_chastisements(schoolkid)
-        create_commendation(schoolkid, subject)
+    if get_user(FULL_NAME) is None:
+        print(f'Ученик с именем "{FULL_NAME}" не найден.')
+    elif get_subject(FULL_NAME, TITLE) is None:
+        print(f'Учебный предмет "{TITLE}" не найден.')
+    else:
+        fix_marks(get_user(FULL_NAME))
+        remove_chastisements(get_user(FULL_NAME))
+        create_commendation(get_user(FULL_NAME),
+                            get_subject(FULL_NAME, TITLE))
         print("""
 Из журнала удалены двойки и тройки
 Плохие комментарии от учителя удалены
 Положительный комментарий к уроку добавлен""")
-
-    except Schoolkid.DoesNotExist:
-        print(f'Ученик с именем "{FULL_NAME}" не найден.')
-    except Subject.DoesNotExist:
-        print(f'Учебный предмет "{TITLE}" не найден.')
 
 
 if __name__ == '__main__':
